@@ -1,0 +1,58 @@
+.video-grid {
+  display: grid;
+  gap: 1rem;
+  height: 100%;
+}
+
+.video-container {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: #1e293b;
+}
+
+.video-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background-color: #334155;
+  color: white;
+  flex-direction: column;
+}
+
+.user-label {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0.5rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.controls-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #1e293b;
+}
+
+.control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-button:hover {
+  transform: scale(1.05);
+}

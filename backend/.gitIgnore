@@ -1,0 +1,17 @@
+
+/node_modules
+/config/config.json
+/.vscode/launch.json
+package-lock.json
+yarn.lock
+temp/
+settings.json
+.DS_Store
+dump.rdb
+yarn-error.log
+.vscodenv
+.env
+.env.local
+.env.development.local
+.env.test.local
+.vscode/
