@@ -18,8 +18,12 @@ import useAgora from "../hooks/useAgora";
 const Room = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const [isMuted, setIsMuted] = useState(false);
-  const [isVideoOff, setIsVideoOff] = useState(false);
+  
+  const initialAudioState = localStorage.getItem("initialAudioState") || "unmuted";
+  const initialVideoState = localStorage.getItem("initialVideoState") || "on";
+  
+  const [isMuted, setIsMuted] = useState(initialAudioState === "muted");
+  const [isVideoOff, setIsVideoOff] = useState(initialVideoState === "off");
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showParticipants, setShowParticipants] = useState(false);
@@ -54,8 +58,23 @@ const Room = () => {
       joinAttempted.current = true;
       
       joinChannel(roomId, userName)
-        .then(() => {
+        .then(async () => {
           toast.success(`Joined room: ${roomId}`);
+          
+          setTimeout(async () => {
+            const audioTrack = localTracks.find(track => track?.trackMediaType === "audio");
+            const videoTrack = localTracks.find(track => track?.trackMediaType === "video");
+            
+            if (audioTrack) {
+              const shouldBeEnabled = !isMuted;
+              await audioTrack.setEnabled(shouldBeEnabled);
+            }
+            
+            if (videoTrack) {
+              const shouldBeEnabled = !isVideoOff;
+              await videoTrack.setEnabled(shouldBeEnabled);
+            }
+          }, 1000);
         })
         .catch(err => {
           console.error("Failed to join channel:", err);
@@ -75,7 +94,7 @@ const Room = () => {
           }
         });
     }
-  }, [roomId, userName, navigate, joinChannel]);
+  }, [roomId, userName, navigate, joinChannel, toggleMic, toggleCamera, isMuted, isVideoOff]);
 
   useEffect(() => {
     if (joined) {
@@ -105,13 +124,37 @@ const Room = () => {
   }, [remoteTracks]);
 
   const handleToggleMic = async () => {
-    const enabled = await toggleMic();
-    setIsMuted(!enabled);
+    try {
+      const audioTrack = localTracks.find(track => track?.trackMediaType === "audio");
+      if (audioTrack) {
+        const newState = !audioTrack.enabled;
+        await audioTrack.setEnabled(newState);
+        setIsMuted(!newState);
+      } else {
+        const enabled = await toggleMic();
+        setIsMuted(!enabled);
+      }
+    } catch (error) {
+      console.error("Error toggling microphone:", error);
+      toast.error("Failed to toggle microphone");
+    }
   };
 
   const handleToggleVideo = async () => {
-    const enabled = await toggleCamera();
-    setIsVideoOff(!enabled);
+    try {
+      const videoTrack = localTracks.find(track => track?.trackMediaType === "video");
+      if (videoTrack) {
+        const newState = !videoTrack.enabled;
+        await videoTrack.setEnabled(newState);
+        setIsVideoOff(!newState);
+      } else {
+        const enabled = await toggleCamera();
+        setIsVideoOff(!enabled);
+      }
+    } catch (error) {
+      console.error("Error toggling camera:", error);
+      toast.error("Failed to toggle camera");
+    }
   };
 
   const handleToggleScreenShare = async () => {

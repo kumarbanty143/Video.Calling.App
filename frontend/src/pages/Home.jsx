@@ -30,7 +30,7 @@ const Home = () => {
     setCreating(true);
     const newRoomId = generateRandomId(8);
     localStorage.setItem("userName", userName);
-    navigate(`/room/${newRoomId}`);
+    navigate(`/preview/${newRoomId}`);
   };
 
   const joinRoom = () => {
@@ -45,7 +45,7 @@ const Home = () => {
     
     setJoining(true);
     localStorage.setItem("userName", userName);
-    navigate(`/room/${roomId}`);
+    navigate(`/preview/${roomId}`);
   };
 
   const handleKeyPress = (e) => {

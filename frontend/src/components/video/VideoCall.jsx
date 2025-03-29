@@ -101,17 +101,30 @@ const VideoCall = ({ localTracks, remoteTracks, isVideoOff }) => {
   
   useEffect(() => {
     const videoTrack = localTracks?.find(track => track?.trackMediaType === "video");
-    if (videoTrack && localVideoRef.current) {
+    if (videoTrack && localVideoRef.current && !isVideoOff) {
       videoTrack.play(localVideoRef.current);
     }
     
     return () => {
-      videoTrack?.stop();
+      if (videoTrack) {
+        videoTrack.stop();
+      }
     };
-  }, [localTracks]);
+  }, [localTracks, isVideoOff]);
+
+  useEffect(() => {
+    if (!isVideoOff) {
+      const videoTrack = localTracks?.find(track => track?.trackMediaType === "video");
+      if (videoTrack && localVideoRef.current) {
+        setTimeout(() => {
+          videoTrack.play(localVideoRef.current);
+        }, 100);
+      }
+    }
+  }, [isVideoOff, localTracks]);
 
   const calculateGridStyle = () => {
-    const totalParticipants = Object.keys(remoteTracks).length + 1;
+    const totalParticipants = Object.keys(remoteTracks || {}).length + 1;
     
     if (totalParticipants === 1) {
       return {...videoStyles.grid, ...videoStyles.gridCols1};
@@ -135,14 +148,14 @@ const VideoCall = ({ localTracks, remoteTracks, isVideoOff }) => {
             </div>
           </div>
         ) : (
-          <div ref={localVideoRef} style={videoStyles.videoContainer}></div>
+          <div ref={localVideoRef} className="local-video-container" style={videoStyles.videoContainer}></div>
         )}
         <div style={videoStyles.nameTag}>
           You (Local)
         </div>
       </Card>
       
-      {Object.entries(remoteTracks).map(([uid, tracks]) => (
+      {Object.entries(remoteTracks || {}).map(([uid, tracks]) => (
         <RemoteVideo 
           key={uid} 
           uid={uid} 
